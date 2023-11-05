@@ -30,7 +30,7 @@ class SetGameViewModel: ObservableObject {
 
     func NewGame() { setGame.newGame() }
 
-    func dealThreeCards()    { setGame.dealCard(numberOfCardsToDeal:  3) }
+    func drawThreeCards()    { setGame.dealCard(numberOfCardsToDeal:  3) }
     func dealStartingTable() { setGame.dealCard(numberOfCardsToDeal: 12) }
 
     func SelectCard(_ card: Card) { setGame.selectCard(card) }

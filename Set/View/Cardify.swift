@@ -15,7 +15,7 @@ struct Cardify: ViewModifier, Animatable {
     }
     
     var isFaceUp: Bool {
-        rotation < 900
+        rotation < 90
     }
     
     var rotation: Double
@@ -32,7 +32,9 @@ struct Cardify: ViewModifier, Animatable {
                 .background { base.foregroundColor(.white) }
                 .overlay { content }
                 .opacity(isFaceUp ? 1 : 0)
-            base.fill().opacity(isFaceUp ? 0 : 1)
+            base.fill()
+                .overlay { Image("Mickey").resizable().rotation3DEffect(.degrees(rotation), axis: (x: 0, y: 1, z: 0) ).padding() }
+                .opacity(isFaceUp ? 0 : 1)
         }
         .rotation3DEffect(.degrees(rotation), axis: (x: 0, y: 1, z: 0) )
     }

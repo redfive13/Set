@@ -25,7 +25,7 @@ struct SetGameView: View {
 
     var table: some View {
         
-        AspectVGrid(game.deck, aspectRatio: Constants.aspectRatio) { card in
+        AspectVGrid(game.drawPile, aspectRatio: Constants.aspectRatio) { card in
             view(for: card)
                 .foregroundStyle(game.cardColor)
                 .padding(Constants.spacing)
@@ -65,18 +65,35 @@ struct SetGameView: View {
     }
 
     var title: some View {
-        Text("Set!")
+        Text("Set!").font(.largeTitle)
     }
 
     var bottomControls: some View {
         HStack {
-            Text("New game")
+            newGame
             Spacer()
             Text("Draw 3")
         }
         .padding()
     }
     
+    var newGame: some View {
+        Text("New Game")
+            .onTapGesture {
+                withAnimation {
+                    game.NewGame()
+                }
+            }
+    }
+    
+    var DrawThree: some View {
+        Text("Draw 3")
+            .onTapGesture {
+                withAnimation {
+                    game.drawThreeCards()
+                }
+            }
+    }
     
     private struct Constants {
         static let aspectRatio: CGFloat = 2/3
