@@ -33,12 +33,15 @@ struct SetGame {
     }
     
     mutating func newGame() {
+        print("New Game")
         deck.indices.forEach { index in
-            deck[index].location = .table
+            deck[index].location = .drawPile
             deck[index].isFaceUp = false
         }
-        deck.shuffle()
-    }
+//        deck.shuffle()
+        deck[0].location = .table
+        deck[1].location = .table
+        deck[2].location = .table    }
     
     mutating func MoveCardToDrawPile(_ card: Card) {
         moveCardTo(card, location: .drawPile)

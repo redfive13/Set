@@ -15,6 +15,7 @@ struct CardView: View {
     
     init(_ card: Card) {
         self.card = card
+//        let _ = print("cardview \(card)    ")
     }
     
     var body: some View {

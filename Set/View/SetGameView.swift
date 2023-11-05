@@ -25,7 +25,7 @@ struct SetGameView: View {
 
     var table: some View {
         
-        AspectVGrid(game.drawPile, aspectRatio: Constants.aspectRatio) { card in
+        AspectVGrid(game.table, aspectRatio: Constants.aspectRatio) { card in
             view(for: card)
                 .foregroundStyle(game.cardColor)
                 .padding(Constants.spacing)
