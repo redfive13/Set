@@ -59,6 +59,33 @@ struct SetGameView: View {
 
 
     
+    private var deck: some View {
+        ZStack {
+            ForEach(game.drawPile) { card in
+                view(for: card)
+            }
+            Text("\(game.drawPile.count)")
+        }
+        .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
+        .onTapGesture {
+            deal()
+        }
+    }
+
+    private func deal() {
+        var delay: TimeInterval = 0
+        for card in game.drawPile {
+            withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
+//                _ = dealt.insert(card.id)
+            }
+            delay += Constants.Deal.dealInterval
+        }
+    }
+
+    
+    // TODO:  make stuff private
+    
+    
     func drawCard(card: Card) {
         CardView(card)
             .cardify(isFaceUp: true)
@@ -72,13 +99,16 @@ struct SetGameView: View {
         HStack {
             newGame
             Spacer()
-            Text("Draw 3")
+            deck
+            Spacer()
+            DrawThree
         }
         .padding()
     }
     
     var newGame: some View {
         Text("New Game")
+            .font(.title2)
             .onTapGesture {
                 withAnimation {
                     game.NewGame()
@@ -88,6 +118,7 @@ struct SetGameView: View {
     
     var DrawThree: some View {
         Text("Draw 3")
+            .font(.title2)
             .onTapGesture {
                 withAnimation {
                     game.drawThreeCards()
@@ -98,10 +129,10 @@ struct SetGameView: View {
     private struct Constants {
         static let aspectRatio: CGFloat = 2/3
         static let spacing: CGFloat = 4
-//        struct Deal {
-//            static let dealAnimation: Animation = .easeInOut(duration: 1)
-//            static let dealInterval: TimeInterval = 0.15
-//        }
+        struct Deal {
+            static let dealAnimation: Animation = .easeInOut(duration: 1)
+            static let dealInterval: TimeInterval = 0.15
+        }
         static let deckWidth: CGFloat = 50
     }
 
