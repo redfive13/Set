@@ -9,18 +9,31 @@ import SwiftUI
 
 class SetGameViewModel: ObservableObject {
     typealias Card = SetGame.Card
+    typealias Deck = [Card]
 
     @Published private var setGame = SetGame()
     
-    var deck: [Card] {
-        return setGame.deck
-    }
+    var drawPile: Deck    { setGame.drawPile }
+    var table: Deck       { setGame.table }
+    var discardPile: Deck { setGame.discardPile }
     
     var cardColor: Color {
         return Color(.blue)
     }
     
+    
+    // MARK: - Intents
+    
+//    func MoveCardToDrawPile(    _ card: Card) { setGame.MoveCardToDrawPile(card) }
+//    func MoveCardToTable(       _ card: Card) { setGame.MoveCardToTable(card) }
+//    func MoveCardToDiscardPile( _ card: Card) { setGame.MoveCardToDiscardPile(card) }
 
+    func NewGame() { setGame.newGame() }
+
+    func dealThreeCards()    { setGame.dealCard(numberOfCardsToDeal:  3) }
+    func dealStartingTable() { setGame.dealCard(numberOfCardsToDeal: 12) }
+
+    func SelectCard(_ card: Card) { setGame.selectCard(card) }
 }
 
 

@@ -8,11 +8,16 @@
 import Foundation
 
 struct SetGame {
-    private (set) var deck: [Card] = []
+    typealias Deck = [Card]
+    
+    private (set) var deck: Deck = []
+    var drawPile: Deck    { deck.filter { $0.location == .drawPile } }
+    var table: Deck       { deck.filter { $0.location == .table } }
+    var discardPile: Deck { deck.filter { $0.location == .discardPile } }
     
     init() {
-
         createCards()
+        newGame()
     }
     
     mutating func createCards() {
@@ -27,7 +32,43 @@ struct SetGame {
         }
     }
     
+    mutating func newGame() {
+        deck.indices.forEach { index in
+            deck[index].location = .table
+            deck[index].isFaceUp = false
+        }
+        deck.shuffle()
+    }
+    
+    mutating func MoveCardToDrawPile(_ card: Card) {
+        moveCardTo(card, location: .drawPile)
+    }
 
- 
+    mutating func MoveCardToTable(_ card: Card) {
+        moveCardTo(card, location: .table)
+    }
+    
+    mutating func MoveCardToDiscardPile(_ card: Card) {
+        moveCardTo(card, location: .discardPile)
+    }
+    
+    mutating func dealCard(numberOfCardsToDeal: Int) {
+        drawPile.prefix(numberOfCardsToDeal).indices.forEach { index in
+            deck[index].location = .table
+        }
+    }
+    
+    mutating func selectCard(_ card: Card) {
+        print("card was selected \(card)")
+    }
+    
+    // MARK: - Helper function
+    
+    private mutating func moveCardTo( _ card: Card, location: Location ) {
+        if let index = deck.firstIndex(where: { $0.id == card.id }) {
+            deck[index].location = location
+        }
+    }
+    
 }
     

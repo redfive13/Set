@@ -7,9 +7,8 @@
 
 import Foundation
 
-
 extension SetGame {
-    
+
     struct Card: Identifiable {
         let feature: [Option]
         var isFaceUp = false
