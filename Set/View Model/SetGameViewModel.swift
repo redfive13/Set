@@ -10,7 +10,7 @@ import SwiftUI
 class SetGameViewModel: ObservableObject {
     typealias Card = SetGame.Card
     typealias Deck = [Card]
-
+    
     @Published private var setGame = SetGame()
     
     var drawPile: Deck    { setGame.drawPile }
@@ -22,18 +22,80 @@ class SetGameViewModel: ObservableObject {
     }
     
     
+    
+    
+    
+    
+    
     // MARK: - Intents
     
-//    func MoveCardToDrawPile(    _ card: Card) { setGame.MoveCardToDrawPile(card) }
-//    func MoveCardToTable(       _ card: Card) { setGame.MoveCardToTable(card) }
-//    func MoveCardToDiscardPile( _ card: Card) { setGame.MoveCardToDiscardPile(card) }
-
+    //    func MoveCardToDrawPile(    _ card: Card) { setGame.MoveCardToDrawPile(card) }
+    //    func MoveCardToTable(       _ card: Card) { setGame.MoveCardToTable(card) }
+    //    func MoveCardToDiscardPile( _ card: Card) { setGame.MoveCardToDiscardPile(card) }
+    
     func NewGame() { setGame.newGame() }
-
+    
     func drawThreeCards()    { setGame.dealCard(numberOfCardsToDeal:  3) }
     func dealStartingTable() { setGame.dealCard(numberOfCardsToDeal: 12) }
-
+    
     func SelectCard(_ card: Card) { setGame.selectCard(card) }
+    
+    
+    
+    func number(on card: Card) -> Int {
+        switch card.feature[Constants.Feature.number] {
+        case .option1:
+            return 1
+        case .option2:
+            return 2
+        case .option3:
+            return 3
+        }
+    }
+    
+    func shape(of card: Card) -> CardShapes {
+        switch card.feature[Constants.Feature.shape] {
+        case .option1:
+            return .diamond
+        case .option2:
+            return .squiggle
+        case .option3:
+            return .oval
+        }
+    }
+    
+    func shading(of card: Card) -> CardShading {
+        switch card.feature[Constants.Feature.shading] {
+        case .option1:
+            return .solid
+        case .option2:
+            return .striped
+        case .option3:
+            return .open
+        }
+    }
+    
+    func color(of card: Card) -> Color {
+        switch card.feature[Constants.Feature.color] {
+        case .option1:
+            return Color(.red)
+        case .option2:
+            return Color(.green)
+        case .option3:
+            return Color(.purple)
+        }
+    }
+    
+    private struct Constants {
+        struct Feature {
+            static let number = 0
+            static let shape = 1
+            static let shading = 2
+            static let color = 3
+        }
+        
+        
+    }
 }
 
 
