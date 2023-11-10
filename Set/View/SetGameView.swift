@@ -14,6 +14,7 @@ struct SetGameView: View {
     typealias Card = SetGame.Card
     
     @ObservedObject var game: SetGameViewModel
+    
 
     var body: some View {
         VStack  {
@@ -126,6 +127,8 @@ struct SetGameView: View {
             }
     }
     
+
+
     private struct Constants {
         static let aspectRatio: CGFloat = 2/3
         static let spacing: CGFloat = 4
@@ -135,11 +138,16 @@ struct SetGameView: View {
         }
         static let deckWidth: CGFloat = 50
     }
-
-    
-    
 }
 
-#Preview {
-    SetGameView(game: SetGameViewModel())
+enum CardShapes {
+    case diamond
+    case squiggle
+    case oval
+}
+
+enum CardShading {
+    case solid
+    case striped
+    case open
 }
