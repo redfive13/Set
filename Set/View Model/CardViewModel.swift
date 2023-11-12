@@ -65,9 +65,19 @@ struct CardViewModel {
             static let shading = 2
             static let color = 3
         }
-        
-        
     }
+}
+
+enum CardShapes {
+    case diamond
+    case squiggle
+    case oval
+}
+
+enum CardShading {
+    case solid
+    case striped
+    case open
 }
 
 extension SetGame.Card: CustomDebugStringConvertible {

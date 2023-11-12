@@ -16,11 +16,9 @@
 		460319F92AF6977F00C0368F /* AspectVGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460319F82AF6977F00C0368F /* AspectVGrid.swift */; };
 		460319FB2AF697A300C0368F /* SetGameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460319FA2AF697A300C0368F /* SetGameViewModel.swift */; };
 		460319FD2AF697D900C0368F /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460319FC2AF697D900C0368F /* Card.swift */; };
-		466BF9852AFB399A00C1717D /* SetCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466BF9842AFB399A00C1717D /* SetCard.swift */; };
-		466BF9872AFB43B500C1717D /* GetShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466BF9862AFB43B500C1717D /* GetShape.swift */; };
-		466BF9892AFD3EE000C1717D /* CardFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466BF9882AFD3EE000C1717D /* CardFace.swift */; };
 		467524B42AF713040033227A /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467524B32AF713040033227A /* CardView.swift */; };
 		469CF7DA2AFD59B7009F6186 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469CF7D92AFD59B7009F6186 /* CardViewModel.swift */; };
+		46D0744F2AFEA7F20004C521 /* Table.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46D0744E2AFEA7F20004C521 /* Table.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,11 +32,9 @@
 		460319F82AF6977F00C0368F /* AspectVGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectVGrid.swift; sourceTree = "<group>"; };
 		460319FA2AF697A300C0368F /* SetGameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameViewModel.swift; sourceTree = "<group>"; };
 		460319FC2AF697D900C0368F /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
-		466BF9842AFB399A00C1717D /* SetCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCard.swift; sourceTree = "<group>"; };
-		466BF9862AFB43B500C1717D /* GetShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetShape.swift; sourceTree = "<group>"; };
-		466BF9882AFD3EE000C1717D /* CardFace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardFace.swift; sourceTree = "<group>"; };
 		467524B32AF713040033227A /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		469CF7D92AFD59B7009F6186 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
+		46D0744E2AFEA7F20004C521 /* Table.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Table.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,11 +89,8 @@
 			isa = PBXGroup;
 			children = (
 				460319E62AF6965200C0368F /* SetGameView.swift */,
-				466BF9842AFB399A00C1717D /* SetCard.swift */,
-				466BF9862AFB43B500C1717D /* GetShape.swift */,
 				467524B32AF713040033227A /* CardView.swift */,
 				460319F62AF6975400C0368F /* Cardify.swift */,
-				466BF9882AFD3EE000C1717D /* CardFace.swift */,
 				460319F82AF6977F00C0368F /* AspectVGrid.swift */,
 			);
 			path = View;
@@ -108,6 +101,7 @@
 			children = (
 				460319F42AF6971E00C0368F /* SetGame.swift */,
 				460319FC2AF697D900C0368F /* Card.swift */,
+				46D0744E2AFEA7F20004C521 /* Table.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -194,12 +188,10 @@
 				460319E72AF6965200C0368F /* SetGameView.swift in Sources */,
 				460319F52AF6971E00C0368F /* SetGame.swift in Sources */,
 				460319FD2AF697D900C0368F /* Card.swift in Sources */,
-				466BF9852AFB399A00C1717D /* SetCard.swift in Sources */,
 				460319F72AF6975400C0368F /* Cardify.swift in Sources */,
 				460319FB2AF697A300C0368F /* SetGameViewModel.swift in Sources */,
-				466BF9872AFB43B500C1717D /* GetShape.swift in Sources */,
-				466BF9892AFD3EE000C1717D /* CardFace.swift in Sources */,
 				469CF7DA2AFD59B7009F6186 /* CardViewModel.swift in Sources */,
+				46D0744F2AFEA7F20004C521 /* Table.swift in Sources */,
 				460319F92AF6977F00C0368F /* AspectVGrid.swift in Sources */,
 				467524B42AF713040033227A /* CardView.swift in Sources */,
 				460319E52AF6965200C0368F /* SetApp.swift in Sources */,

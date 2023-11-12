@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct SetGameView: View {
     
     typealias Card = SetGame.Card
@@ -25,21 +23,21 @@ struct SetGameView: View {
     }
 
     var table: some View {
-        
-        AspectVGrid(game.table, aspectRatio: Constants.aspectRatio) { card in
-            view(for: card)
-                .foregroundStyle(game.cardColor)
-                .padding(Constants.spacing)
-//                .overlay(FlyingNumber(number: scoreChange(causedBy: card)))
-//                .zIndex(scoreChange(causedBy: card) != 0 ? 100 : 0)
-                .onTapGesture {
-                    choose(card)
-                }
+        AspectVGrid(game.tablePile, aspectRatio: Constants.aspectRatio) { card in
+            if isDealt(card) {
+                view(for: card)
+                    .foregroundStyle(game.cardColor)
+                    .padding(Constants.spacing)
+                //                .overlay(FlyingNumber(number: scoreChange(causedBy: card)))
+                //                .zIndex(scoreChange(causedBy: card) != 0 ? 100 : 0)
+                    .onTapGesture {
+                        choose(card)
+                    }
+            }
         }
     }
         
         
-        @Namespace private var dealingNamespace
 
 
     private func view(for card: Card) -> some View {
@@ -48,47 +46,91 @@ struct SetGameView: View {
             .transition(.asymmetric(insertion: .identity, removal: .identity))
         
     }
-            private func choose(_ card: Card) {
-                withAnimation {
-//                    let scoreBeforeChoosing = viewModel.score
-//                    game.choose(card)
-//                    let scoreChange = viewModel.score - scoreBeforeChoosing
-//                    lastScoreChange = (scoreChange, causedByCardID: card.id)
-                }
-            }
-        
+    private func choose(_ card: Card) {
+        withAnimation {
+            game.flipCardFaceUp(card, faceUp: true)
 
+            //                    let scoreBeforeChoosing = viewModel.score
+            game.SelectCard(card)
+            //                    let scoreChange = viewModel.score - scoreBeforeChoosing
+            //                    lastScoreChange = (scoreChange, causedByCardID: card.id)
+        }
+    }
+    
+
+    // MARK: - Dealing from a Deck
+    
+    @State private var dealt = Set<Card.ID>()
+    @State private var faceUp = Set<Card.ID>()
+
+    private func isDealt(_ card: Card) -> Bool {
+        dealt.contains(card.id)
+    }
+    private var undealtCards: [Card] {
+        game.drawPile.filter { !isDealt($0) }
+    }
+    
+    private func isFaceUp(_ card: Card) -> Bool {
+        faceUp.contains(card.id)
+    }
+    private var unFaceUpCards: [Card] {
+        game.tablePile.filter { !isFaceUp($0) }
+    }
+    
+    
+    @Namespace private var dealingNamespace
 
     
     private var deck: some View {
-        ZStack {
-            ForEach(game.drawPile) { card in
+       return ZStack {
+           ForEach(undealtCards) { card in
                 view(for: card)
             }
-            Text("\(game.drawPile.count)")
         }
         .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
-        .onTapGesture {
-            deal()
+        .onAppear() {
+            dealCards(4)
         }
     }
-
-    private func deal() {
-        var delay: TimeInterval = 0
-        for card in game.drawPile {
+    
+    private func dealCards(_ numberOfCards: Int) {
+        var delay: TimeInterval = 0.25
+        var cards = [Card]()
+        for _ in 0..<numberOfCards {
+            let card = game.dealCard()
+            cards.append(card)
+            
+        }
+        cards.forEach{ card in
             withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
-//                _ = dealt.insert(card.id)
+                _ = dealt.insert(card.id)
             }
-            delay += Constants.Deal.dealInterval
+            withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
+//                game.flipCardFaceUp(card, faceUp: true)
+
+            }
+            delay += Constants.Deal.dealInterval + 0.25
         }
+        let _ = print("flip over \(cards.count)")
+
+
+//        cards.forEach { card in
+//            withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
+//                game.flipCardFaceUp(card, faceUp: true)
+//            }
+////            delay += Constants.Deal.dealInterval + 0.250
+//        }
+        
+        
     }
+    
 
     
     // TODO:  make stuff private
     
     
     func drawCard(card: Card) {
-        CardView(card)
+        _ = CardView(card)
             .cardify(isFaceUp: true)
     }
 
@@ -113,6 +155,9 @@ struct SetGameView: View {
             .onTapGesture {
                 withAnimation {
                     game.NewGame()
+                    dealt = []
+                    dealCards(12)
+
                 }
             }
     }
@@ -121,9 +166,9 @@ struct SetGameView: View {
         Text("Draw 3")
             .font(.title2)
             .onTapGesture {
-                withAnimation {
-                    game.drawThreeCards()
-                }
+//                withAnimation {
+                    dealCards(3)
+//                }
             }
     }
     
@@ -140,14 +185,7 @@ struct SetGameView: View {
     }
 }
 
-enum CardShapes {
-    case diamond
-    case squiggle
-    case oval
-}
-
-enum CardShading {
-    case solid
-    case striped
-    case open
+#Preview {
+    let game = SetGameViewModel()
+    return SetGameView(game: game)
 }

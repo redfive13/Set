@@ -12,7 +12,7 @@ struct SetGame {
     
     private (set) var deck: Deck = []
     var drawPile: Deck    { deck.filter { $0.location == .drawPile } }
-    var table: Deck       { deck.filter { $0.location == .table } }
+    var table: Deck       { deck.filter { $0.location.isTable } }
     var discardPile: Deck { deck.filter { $0.location == .discardPile } }
     
     init() {
@@ -38,26 +38,42 @@ struct SetGame {
             deck[index].location = .drawPile
             deck[index].isFaceUp = false
         }
-//        deck.shuffle()
-        deck[0].location = .table
-        deck[1].location = .table
-        deck[2].location = .table    }
+    }
     
     mutating func MoveCardToDrawPile(_ card: Card) {
         moveCardTo(card, location: .drawPile)
     }
-
-    mutating func MoveCardToTable(_ card: Card) {
-        moveCardTo(card, location: .table)
+    
+    mutating func MoveCardToTable(_ card: Card, slot: Int) {
+        moveCardTo(card, location: .table(slot))
     }
     
     mutating func MoveCardToDiscardPile(_ card: Card) {
         moveCardTo(card, location: .discardPile)
     }
     
-    mutating func dealCard(numberOfCardsToDeal: Int) {
-        drawPile.prefix(numberOfCardsToDeal).indices.forEach { index in
-            deck[index].location = .table
+    mutating func dealCard() -> Card {
+        if let card = drawPile.first {
+            let locationOccupied = table.compactMap{ $0.location.slot }.sorted()
+            
+            var location = 0
+            while (location < locationOccupied.count) {
+                if locationOccupied[location] != location {
+                    break
+                }
+                location += 1
+            }
+            MoveCardToTable(card, slot: location)
+            return card
+        }
+        fatalError("dealCard: draw pile is empty")
+    }
+    
+    mutating func flipCardFaceUp(_ card: Card, faceUp: Bool) {
+        if let index = deck.firstIndex(where: { $0.id == card.id }) {
+            print("was \(deck[index])")
+            deck[index].isFaceUp = faceUp
+            print("is \(deck[index])")
         }
     }
     
@@ -70,8 +86,12 @@ struct SetGame {
     private mutating func moveCardTo( _ card: Card, location: Location ) {
         if let index = deck.firstIndex(where: { $0.id == card.id }) {
             deck[index].location = location
+//            if location.isTable {
+//                deck[index].isFaceUp = true
+//            } else {
+//                deck[index].isFaceUp = false
+//            }
         }
     }
-    
 }
     
