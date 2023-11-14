@@ -15,7 +15,7 @@ extension SetGame {
 
         
         let feature: [Option]
-        var isFaceUp = false
+//        var isFaceUp = false
         var location = Location.drawPile
         
         var id = UUID().uuidString
@@ -26,13 +26,13 @@ extension SetGame {
         
         init(slot: Int) {
             feature = []
-            isFaceUp = false
+//            isFaceUp = false
             location = .table(slot)
         }
         
         init(feature1: Option, feature2: Option, feature3: Option, feature4: Option, isFaceUp: Bool) {
             feature = [feature1, feature2, feature3, feature4]
-            self.isFaceUp = isFaceUp
+//            self.isFaceUp = isFaceUp
         }
         
         static func == (lhs: SetGame.Card, rhs: SetGame.Card) -> Bool {

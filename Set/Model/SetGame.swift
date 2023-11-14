@@ -12,7 +12,7 @@ struct SetGame {
     
     private (set) var deck: Deck = []
     var drawPile: Deck    { deck.filter { $0.location == .drawPile } }
-    var table: Deck       { deck.filter { $0.location.isTable } }
+    var table: Deck       { deck.filter { !($0.location == .drawPile) && !($0.location == .discardPile)}}
     var discardPile: Deck { deck.filter { $0.location == .discardPile } }
     
     init() {
@@ -36,7 +36,7 @@ struct SetGame {
         print("New Game")
         deck.indices.forEach { index in
             deck[index].location = .drawPile
-            deck[index].isFaceUp = false
+//            deck[index].isFaceUp = false
         }
     }
     
@@ -69,13 +69,13 @@ struct SetGame {
         fatalError("dealCard: draw pile is empty")
     }
     
-    mutating func flipCardFaceUp(_ card: Card, faceUp: Bool) {
-        if let index = deck.firstIndex(where: { $0.id == card.id }) {
-            print("was \(deck[index])")
-            deck[index].isFaceUp = faceUp
-            print("is \(deck[index])")
-        }
-    }
+//    mutating func flipCardFaceUp(_ card: Card, faceUp: Bool) {
+//        if let index = deck.firstIndex(where: { $0.id == card.id }) {
+//            print("was \(deck[index])")
+//            deck[index].isFaceUp = faceUp
+//            print("is \(deck[index])")
+//        }
+//    }
     
     mutating func selectCard(_ card: Card) {
         print("card was selected \(card)")

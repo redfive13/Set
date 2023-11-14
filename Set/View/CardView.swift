@@ -11,15 +11,17 @@ struct CardView: View {
     typealias Card = SetGameView.Card
     
     let card: Card
+    let isFaceUp: Bool
     
-    init(_ card: Card) {
+    init(_ card: Card, isFaceUp: Bool = false) {
         self.card = card
+        self.isFaceUp = isFaceUp
     }
     
     var body: some View {
         TimelineView(.animation) {timeline in
             cardFace(card)
-                .cardify(isFaceUp: card.isFaceUp)
+                .cardify(isFaceUp: isFaceUp)
         }
     }
     

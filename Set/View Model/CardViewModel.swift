@@ -120,8 +120,8 @@ extension SetGame.Card: CustomDebugStringConvertible {
             description += "table "
         }
         
-        description += isFaceUp  ? "up" : "down"
-        
+//        description += isFaceUp  ? "up" : "down"
+//        
         return description
     }
 }

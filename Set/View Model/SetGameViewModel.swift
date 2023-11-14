@@ -30,9 +30,9 @@ class SetGameViewModel: ObservableObject {
     
     // MARK: - Intents
     
-    //    func MoveCardToDrawPile(    _ card: Card) { setGame.MoveCardToDrawPile(card) }
-    //    func MoveCardToTable(       _ card: Card) { setGame.MoveCardToTable(card) }
-    //    func MoveCardToDiscardPile( _ card: Card) { setGame.MoveCardToDiscardPile(card) }
+        func MoveCardToDrawPile(    _ card: Card) { setGame.MoveCardToDrawPile(card) }
+//        func MoveCardToTable(       _ card: Card) { setGame.MoveCardToTable(card) }
+        func MoveCardToDiscardPile( _ card: Card) { setGame.MoveCardToDiscardPile(card) }
     
     func NewGame() {
         setGame.newGame()
@@ -52,9 +52,9 @@ class SetGameViewModel: ObservableObject {
     
     func SelectCard(_ card: Card) { setGame.selectCard(card) }
 
-    func flipCardFaceUp(_ card: Card, faceUp: Bool) {
-        setGame.flipCardFaceUp(card, faceUp: faceUp)
-    }
+//    func flipCardFaceUp(_ card: Card, faceUp: Bool) {
+//        setGame.flipCardFaceUp(card, faceUp: faceUp)
+//    }
     
 }
     
