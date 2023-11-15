@@ -44,8 +44,8 @@ struct SetGame {
         moveCardTo(card, location: .drawPile)
     }
     
-    mutating func MoveCardToTable(_ card: Card, slot: Int) {
-        moveCardTo(card, location: .table(slot))
+    mutating func MoveCardToTable(_ card: Card) {
+        moveCardTo(card, location: .table)
     }
     
     mutating func MoveCardToDiscardPile(_ card: Card) {
@@ -54,16 +54,7 @@ struct SetGame {
     
     mutating func dealCard() -> Card {
         if let card = drawPile.first {
-            let locationOccupied = table.compactMap{ $0.location.slot }.sorted()
-            
-            var location = 0
-            while (location < locationOccupied.count) {
-                if locationOccupied[location] != location {
-                    break
-                }
-                location += 1
-            }
-            MoveCardToTable(card, slot: location)
+            MoveCardToTable(card)
             return card
         }
         fatalError("dealCard: draw pile is empty")

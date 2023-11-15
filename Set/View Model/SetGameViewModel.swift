@@ -60,3 +60,17 @@ class SetGameViewModel: ObservableObject {
     
 
 
+
+
+
+
+
+//let locationOccupied = table.compactMap{ $0.location.slot }.sorted()
+//
+//var location = 0
+//while (location < locationOccupied.count) {
+//    if locationOccupied[location] != location {
+//        break
+//    }
+//    location += 1
+//}

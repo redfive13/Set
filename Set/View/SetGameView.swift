@@ -15,6 +15,21 @@ struct SetGameView: View {
     @Namespace private var dealingNamespace
     @Namespace private var discardNamespace
     @Namespace private var shuffleNamespace
+    
+//    init(game: SetGameViewModel) {
+//        self.game = game
+//        
+//        let _ = print("*********")
+//        
+//       var status = [Card.ID: SetGame.Location]()
+//
+//        game.drawPile.forEach { card in
+//            status[card.id] = .drawPile
+//            print("foox \(status[card.id] == .drawPile)     \(status.count)")
+//        }
+//        let _ = print("init \(game.drawPile.count)")
+//        let _ = print("init \(status.count)")
+//    }
 
     var body: some View {
 
@@ -60,7 +75,7 @@ struct SetGameView: View {
     private var table: some View {
         AspectVGrid(game.tablePile, aspectRatio: Constants.aspectRatio) { card in
             if isDealt(card) {
-                view(for: card, nameSpace: "table-")
+                view(for: card)
                     .foregroundStyle(game.cardColor)
                     .padding(Constants.spacing)
                 //                .overlay(FlyingNumber(number: scoreChange(causedBy: card)))
@@ -73,26 +88,37 @@ struct SetGameView: View {
     }
         
     private var deck: some View {
-        ZStack {
-           ForEach(undealtCards) { card in
-                view(for: card, nameSpace: "table-")
+         VStack{
+            ZStack {
+                ZStack {
+                    ForEach(game.drawPile) { card in
+                        view(for: card)
+                    }
+                }
+                Text("Draw")
+                    .font(.caption2)
+                    .rotationEffect(.degrees(45))
+                    .cardify(isFaceUp: true)
+                    .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
+                    .opacity(game.drawPile.count > 0 ? 0 : 1)
             }
-        }
-        .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
-        .onAppear() {
-            dealCards(Constants.StartingCards)
-        }
-        .onTapGesture {
-            dealCards(Constants.DrawMoreCards)
+            .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
+            .onAppear() {
+                dealCards(Constants.StartingCards)
+            }
+            .onTapGesture {
+                dealCards(Constants.DrawMoreCards)
+            }
+             Text("\(game.drawPile.count)")
+            
         }
     }
     
     private var discard: some View {
-        ZStack {
             VStack {
                 ZStack {
                     ForEach(unDiscadedCards) { card in
-                        view(for: card, nameSpace: "discard-")
+                        view(for: card)
                     }
                     
                     Text("Discard")
@@ -104,7 +130,6 @@ struct SetGameView: View {
                 .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
                 Text("\(unDiscadedCards.count)")
             }
-        }
 // TODO: factor out frame
     }
         
@@ -128,9 +153,9 @@ struct SetGameView: View {
     }
 
 
-    private func view(for card: Card, nameSpace: String) -> some View {
+    private func view(for card: Card) -> some View {  // FIXME
         CardView(card, isFaceUp: isFaceUp(card))
-            .matchedGeometryEffect(id: "dealt-" + card.id, in: dealingNamespace)
+            .matchedGeometryEffect(id: card.id, in: dealingNamespace)
             .transition(.asymmetric(insertion: .identity, removal: .identity))
                  }
 
@@ -166,20 +191,8 @@ struct SetGameView: View {
 
     // MARK: - Dealing from a Deck
     
-    @State private var dealt = Set<Card.ID>()
     @State private var faceUp = Set<Card.ID>()
-    @State private var discarded = Set<Card.ID>()
-    @State private var draw = Set<Card.ID>()
 
-    @State private var timeDelay: TimeInterval = 0
-
-    private func isDealt(_ card: Card) -> Bool {
-        dealt.contains(card.id)
-    }
-    private var undealtCards: [Card] {
-        game.drawPile.filter { !isDealt($0) }
-    }
-    
     private func isFaceUp(_ card: Card) -> Bool {
         faceUp.contains(card.id)
     }
@@ -187,11 +200,58 @@ struct SetGameView: View {
         game.tablePile.filter { !isFaceUp($0) }
     }
 
+
+    
+    
+    
+    @State private var status = [Card.ID: SetGame.Location]()
+    
+//    @State private var dealt = Set<Card.ID>()
+    @State private var discarded = Set<Card.ID>()
+    @State private var draw = Set<Card.ID>()
+
+    @State private var timeDelay: TimeInterval = 0
+    
+    
+    private func cardNeedsToMove(_ card: Card, location wantedLocation: SetGame.Location) -> Bool {
+        if let location = status[card.id] {
+            if card.location == wantedLocation && location !=  wantedLocation {
+                return true
+            } else {
+                status[card.id] = .drawPile
+                if card.location == wantedLocation && .drawPile !=  wantedLocation {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private func isDealt(_ card: Card) -> Bool {
+        if let location = status[card.id] {
+            if location == .table {
+                return true
+            }
+        }
+        return false
+    }
+    private var undealtCards: [Card] {
+        return game.drawPile.filter { cardNeedsToMove($0, location: .table) }
+    }
+    
     private func isDiscarded(_ card: Card) -> Bool {
-        discarded.contains(card.id)
+        if let location = status[card.id] {
+            if location == .table {
+                return true
+            }
+        }
+        return false
+
     }
     private var unDiscadedCards: [Card] {
-        game.tablePile.filter { !isDiscarded($0) }
+        let foo = game.tablePile.filter { cardNeedsToMove($0, location: .discardPile) }
+        let _ = print("unDiscadedCards = \(foo.count)")
+            return foo
     }
     
     private func isDrawn(_ card: Card) -> Bool {
@@ -215,9 +275,8 @@ struct SetGameView: View {
         }
         cards.forEach{ card in
             withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
-                _ = dealt.insert(card.id)
-
-            }     
+                status[card.id] = .table
+            }
             withAnimation(Constants.Deal.dealAnimation.delay(delay + 0.5)) {
                 _ = faceUp.insert(card.id)
 
@@ -234,8 +293,8 @@ struct SetGameView: View {
         }
         cards.forEach{ card in
             withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
-                _ = dealt.remove(card.id)
-                _ = discarded.insert(card.id)
+//                _ = dealt.remove(card.id)
+//                _ = discarded.insert(card.id)
             }
             delay += Constants.Deal.dealInterval
 
@@ -273,7 +332,7 @@ struct SetGameView: View {
     
     private func startNewGame() {
         moveCardsToDiscardPile()
-        dealt = []
+        status.removeAll()
         faceUp = []
 //        game.NewGame()
         dealCards(Constants.StartingCards)
@@ -282,7 +341,7 @@ struct SetGameView: View {
     
     private func moveCardToDiscardPile(_ card: Card, delay: TimeInterval = 0) {
         withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
-            _ = dealt.remove(card.id)
+//            _ = dealt.remove(card.id)
 //                _ = faceUp.remove(card.id)
             _ = discarded.insert(card.id)
 
@@ -298,7 +357,7 @@ struct SetGameView: View {
             }
             
             withAnimation(Constants.Deal.dealAnimation.delay(delay + 0.5 )) {
-                _ = dealt.remove(card.id)
+//                _ = dealt.remove(card.id)
 
             }
 

@@ -11,28 +11,13 @@ extension SetGame {
 
     struct Card: Identifiable, Equatable, Comparable {
 
-        
-
-        
         let feature: [Option]
-//        var isFaceUp = false
         var location = Location.drawPile
         
         var id = UUID().uuidString
         
         init(feature1: Option, feature2: Option, feature3: Option, feature4: Option) {
             feature = [feature1, feature2, feature3, feature4]
-        }
-        
-        init(slot: Int) {
-            feature = []
-//            isFaceUp = false
-            location = .table(slot)
-        }
-        
-        init(feature1: Option, feature2: Option, feature3: Option, feature4: Option, isFaceUp: Bool) {
-            feature = [feature1, feature2, feature3, feature4]
-//            self.isFaceUp = isFaceUp
         }
         
         static func == (lhs: SetGame.Card, rhs: SetGame.Card) -> Bool {
@@ -52,7 +37,7 @@ extension SetGame {
     
     enum Location: Equatable {
         case drawPile
-        case table(_ slot: Int)
+        case table
         case discardPile
     }
     
@@ -61,19 +46,19 @@ extension SetGame {
 }
 
 extension SetGame.Location {
-    var isTable: Bool {
-        switch self {
-        case .table(_): return true
-        default: return false
-        }
-    }
+//    var isTable: Bool {
+//        switch self {
+//        case .table(_): return true
+//        default: return false
+//        }
+//    }
     
-    var slot: Int? {
-        switch self {
-        case .table(let location): return location
-        default: return nil
-        }
-    }
+//    var slot: Int? {
+//        switch self {
+//        case .table(let location): return location
+//        default: return nil
+//        }
+//    }
 }
 
 

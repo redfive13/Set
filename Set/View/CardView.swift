@@ -13,7 +13,7 @@ struct CardView: View {
     let card: Card
     let isFaceUp: Bool
     
-    init(_ card: Card, isFaceUp: Bool = false) {
+    init(_ card: Card, isFaceUp: Bool) {
         self.card = card
         self.isFaceUp = isFaceUp
     }
@@ -228,27 +228,23 @@ struct CardView: View {
     
     return VStack {
         HStack {
-            CardView(Card(feature1: .option1, feature2: .option1, feature3: .option1, feature4: .option1, isFaceUp: true)).aspectRatio(2/3, contentMode: .fit)
-                .cardify(isFaceUp: true)
+            CardView(Card(feature1: .option1, feature2: .option1, feature3: .option1, feature4: .option1), isFaceUp: true)
                 .aspectRatio(2/3, contentMode: .fit)
-            CardView(Card(feature1: .option2, feature2: .option2, feature3: .option2, feature4: .option3, isFaceUp: true)).aspectRatio(2/3, contentMode: .fit)
-                .cardify(isFaceUp: true)
+            CardView(Card(feature1: .option2, feature2: .option2, feature3: .option2, feature4: .option3), isFaceUp: true)
                 .aspectRatio(2/3, contentMode: .fit)
         }
         HStack {
-            CardView(Card(feature1: .option2, feature2: .option3, feature3: .option3, feature4: .option3, isFaceUp: true)).aspectRatio(2/3, contentMode: .fit)
-                .cardify(isFaceUp: true)
+            CardView(Card(feature1: .option2, feature2: .option3, feature3: .option3, feature4: .option3), isFaceUp: true)
                 .aspectRatio(2/3, contentMode: .fit)
-            CardView(Card(feature1: .option1, feature2: .option1, feature3: .option3, feature4: .option2, isFaceUp: true)).aspectRatio(2/3, contentMode: .fit)
-                .cardify(isFaceUp: true)
+
+            CardView(Card(feature1: .option1, feature2: .option1, feature3: .option3, feature4: .option2), isFaceUp: true)
                 .aspectRatio(2/3, contentMode: .fit)
-        }
+
+                }
         HStack {
-            CardView(Card(feature1: .option3, feature2: .option2, feature3: .option2, feature4: .option2, isFaceUp: true)).aspectRatio(2/3, contentMode: .fit)
-                .cardify(isFaceUp: true)
+            CardView(Card(feature1: .option3, feature2: .option2, feature3: .option2, feature4: .option2), isFaceUp: true)
                 .aspectRatio(2/3, contentMode: .fit)
-            CardView(Card(feature1: .option3, feature2: .option1, feature3: .option2, feature4: .option3, isFaceUp: false)).aspectRatio(2/3, contentMode: .fit)
-                .cardify(isFaceUp: false)
+            CardView(Card(feature1: .option3, feature2: .option1, feature3: .option2, feature4: .option3), isFaceUp: false)
                 .aspectRatio(2/3, contentMode: .fit)
         }
     }
