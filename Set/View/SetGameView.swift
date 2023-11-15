@@ -16,21 +16,6 @@ struct SetGameView: View {
     @Namespace private var discardNamespace
     @Namespace private var shuffleNamespace
     
-//    init(game: SetGameViewModel) {
-//        self.game = game
-//        
-//        let _ = print("*********")
-//        
-//       var status = [Card.ID: SetGame.Location]()
-//
-//        game.drawPile.forEach { card in
-//            status[card.id] = .drawPile
-//            print("foox \(status[card.id] == .drawPile)     \(status.count)")
-//        }
-//        let _ = print("init \(game.drawPile.count)")
-//        let _ = print("init \(status.count)")
-//    }
-
     var body: some View {
 
         Text("SwiftUI")
@@ -81,25 +66,27 @@ struct SetGameView: View {
                 //                .overlay(FlyingNumber(number: scoreChange(causedBy: card)))
                 //                .zIndex(scoreChange(causedBy: card) != 0 ? 100 : 0)
                     .onTapGesture {
-                        choose(card)
+                        selectCard(card)
                     }
             }
         }
     }
-        
-    private var deck: some View {
+        // TODO: deals from bottom of the deck
+    private var drawPile: some View {
          VStack{
             ZStack {
                 ZStack {
                     ForEach(game.drawPile) { card in
                         view(for: card)
+                            .zIndex(100)
                     }
                 }
                 Text("Draw")
                     .font(.caption2)
                     .rotationEffect(.degrees(45))
-                    .cardify(isFaceUp: true)
+                    .cardify(isFaceUp: true, selectedStatus: .unselected)
                     .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
+                    .zIndex(-100)
                     .opacity(game.drawPile.count > 0 ? 0 : 1)
             }
             .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
@@ -124,7 +111,7 @@ struct SetGameView: View {
                     Text("Discard")
                         .font(.caption2)
                         .rotationEffect(.degrees(45))
-                        .cardify(isFaceUp: true)
+                        .cardify(isFaceUp: true, selectedStatus: .unselected)
                         .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
                 }
                 .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
@@ -143,7 +130,7 @@ struct SetGameView: View {
     
     private var bottomControls: some View {
         HStack {
-            deck
+            drawPile
             Spacer()
             DrawThree
             Spacer()
@@ -166,10 +153,14 @@ struct SetGameView: View {
 //    }
     
     
-    private func choose(_ card: Card) {
+    private func selectCard(_ card: Card) {
+        game.SelectCard(card)
+        
+        
+        
 //        moveCardToDiscardPile(card)
 
-        moveCardsToDiscard(cards: [card])
+//        moveCardsToDiscard(cards: [card])
         
 //        withAnimation {
 //            if isFaceUp(card) {
@@ -217,11 +208,6 @@ struct SetGameView: View {
         if let location = status[card.id] {
             if card.location == wantedLocation && location !=  wantedLocation {
                 return true
-            } else {
-                status[card.id] = .drawPile
-                if card.location == wantedLocation && .drawPile !=  wantedLocation {
-                    return true
-                }
             }
         }
         return false
@@ -250,7 +236,7 @@ struct SetGameView: View {
     }
     private var unDiscadedCards: [Card] {
         let foo = game.tablePile.filter { cardNeedsToMove($0, location: .discardPile) }
-        let _ = print("unDiscadedCards = \(foo.count)")
+//        let _ = print("unDiscadedCards = \(foo.count)")
             return foo
     }
     

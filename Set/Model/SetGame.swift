@@ -30,6 +30,7 @@ struct SetGame {
                 }
             }
         }
+        deck.removeLast(81 - 27)
     }
     
     mutating func newGame() {
@@ -40,21 +41,29 @@ struct SetGame {
         }
     }
     
-    mutating func MoveCardToDrawPile(_ card: Card) {
+    mutating func selectCard(_ card: Card) {
+        if let index = deck.firstIndex(where: { $0.id == card.id }) {
+            print("before \(deck[index].selected)")
+            deck[index].selected.toggle()
+            print("card was selected \(deck[index])")
+        }
+    }
+    
+    mutating func moveCardToDrawPile(_ card: Card) {
         moveCardTo(card, location: .drawPile)
     }
     
-    mutating func MoveCardToTable(_ card: Card) {
+    mutating func moveCardToTable(_ card: Card) {
         moveCardTo(card, location: .table)
     }
     
-    mutating func MoveCardToDiscardPile(_ card: Card) {
+    mutating func moveCardToDiscardPile(_ card: Card) {
         moveCardTo(card, location: .discardPile)
     }
     
     mutating func dealCard() -> Card {
         if let card = drawPile.first {
-            MoveCardToTable(card)
+            moveCardToTable(card)
             return card
         }
         fatalError("dealCard: draw pile is empty")
@@ -67,10 +76,6 @@ struct SetGame {
 //            print("is \(deck[index])")
 //        }
 //    }
-    
-    mutating func selectCard(_ card: Card) {
-        print("card was selected \(card)")
-    }
     
     // MARK: - Helper function
     
@@ -85,4 +90,3 @@ struct SetGame {
         }
     }
 }
-    

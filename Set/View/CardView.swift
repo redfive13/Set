@@ -21,7 +21,7 @@ struct CardView: View {
     var body: some View {
         TimelineView(.animation) {timeline in
             cardFace(card)
-                .cardify(isFaceUp: isFaceUp)
+                .cardify(isFaceUp: isFaceUp, selectedStatus: .unselected)
         }
     }
     

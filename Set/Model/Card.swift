@@ -13,6 +13,7 @@ extension SetGame {
 
         let feature: [Option]
         var location = Location.drawPile
+        var selected = false
         
         var id = UUID().uuidString
         
