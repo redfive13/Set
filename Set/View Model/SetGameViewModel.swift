@@ -12,12 +12,13 @@ class SetGameViewModel: ObservableObject {
     typealias Deck = [Card]
     
     @Published private var setGame = SetGame()
-//    @Published private var table = Table<Card>()
     
     var drawPile: Deck    { setGame.drawPile }
     var tablePile: Deck   { setGame.table }
     var discardPile: Deck { setGame.discardPile }
     
+    var displayStatus = [Card.ID: HighlightMode]()
+        
     var cardColor: Color {
         return Color(.blue)
     }
@@ -25,7 +26,7 @@ class SetGameViewModel: ObservableObject {
     
     
     
-    
+
     
     
     // MARK: - Intents
@@ -50,15 +51,49 @@ class SetGameViewModel: ObservableObject {
 //        setGame.dealCard(numberOfCardsToDeal: 12)
     }
     
-    func SelectCard(_ card: Card) { setGame.selectCard(card) }
+    func SelectCard(_ card: Card) {
+        setGame.selectCard(card)
+    }
+    
+    func highlightMode(_ card: Card) -> HighlightMode {
+        if setGame.isCardSelected(card) == false {
+            return .unselected
+        }
+        if setGame.selectedCards.count != 3 {
+            return .selected
+        }
+        if setGame.areSelectedCardsASet {
+            return .matched
+        } else {
+            return .mismatched
+        }
+    }
 
+    
+    
+//    case unselected = "unselected"
+//    case selected = "selected"
+//    case matched = "matched"
+//    case mismatched = "mismatched"
+//    case clue = "clue"
+        
+        
+        
+//        return card.selectedStatus
+    
 //    func flipCardFaceUp(_ card: Card, faceUp: Bool) {
 //        setGame.flipCardFaceUp(card, faceUp: faceUp)
 //    }
     
 }
     
-
+enum HighlightMode: String {
+    case unselected = "unselected"
+    case selected = "selected"
+    case matched = "matched"
+    case mismatched = "mismatched"
+    case clue = "clue"
+}
 
 
 

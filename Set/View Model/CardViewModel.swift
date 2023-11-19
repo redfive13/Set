@@ -120,8 +120,12 @@ extension SetGame.Card: CustomDebugStringConvertible {
             description += "table "
         }
         
-        description += selected  ? "selected" : ""
-        
+        if selected {
+            description += "selected "
+        } else {
+            description += "unselected "
+        }
+
         return description
     }
 }

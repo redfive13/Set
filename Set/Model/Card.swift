@@ -14,8 +14,9 @@ extension SetGame {
         let feature: [Option]
         var location = Location.drawPile
         var selected = false
+//        var selectedStatus = SelectedStatus.unselected
         
-        var id = UUID().uuidString
+        let id = UUID()
         
         init(feature1: Option, feature2: Option, feature3: Option, feature4: Option) {
             feature = [feature1, feature2, feature3, feature4]
@@ -28,8 +29,8 @@ extension SetGame {
         static func < (lhs: SetGame.Card, rhs: SetGame.Card) -> Bool {
             return lhs.location == rhs.location
         }
-        
-    }
+}
+    
     enum Option: Int, CaseIterable {
         case option1 = 1
         case option2 = 2
@@ -41,25 +42,7 @@ extension SetGame {
         case table
         case discardPile
     }
-    
-    
-    
 }
 
-extension SetGame.Location {
-//    var isTable: Bool {
-//        switch self {
-//        case .table(_): return true
-//        default: return false
-//        }
-//    }
-    
-//    var slot: Int? {
-//        switch self {
-//        case .table(let location): return location
-//        default: return nil
-//        }
-//    }
-}
 
 

@@ -12,16 +12,20 @@ struct CardView: View {
     
     let card: Card
     let isFaceUp: Bool
+    @ObservedObject var game: SetGameViewModel
     
-    init(_ card: Card, isFaceUp: Bool) {
+    init(_ card: Card, isFaceUp: Bool, game: SetGameViewModel) {
         self.card = card
         self.isFaceUp = isFaceUp
+        self.game = game
     }
     
     var body: some View {
-        TimelineView(.animation) {timeline in
-            cardFace(card)
-                .cardify(isFaceUp: isFaceUp, selectedStatus: .unselected)
+        VStack {
+            TimelineView(.animation) {timeline in
+                cardFace(card)
+                    .cardify(isFaceUp: isFaceUp, highlightMode: game.highlightMode(card))
+            }
         }
     }
     
@@ -67,7 +71,10 @@ struct CardView: View {
                 case .solid:
                     shape.fill()
                 case .striped:
-                    StripeShape().mask(shape)
+                    ZStack {
+                        shape.fill(.white)
+                        StripeShape().mask{shape}
+                    }
                 case .open:
                     shape.fill(.white)
                 }
@@ -116,6 +123,8 @@ struct CardView: View {
             path.addLine(to: CGPoint(x: right, y: center.y))
             path.addLine(to: CGPoint(x: center.x, y: bottom))
             path.addLine(to: CGPoint(x: left, y: center.y))
+            path.addLine(to: CGPoint(x: center.x, y: top))
+
             return path
         }
     }
@@ -124,8 +133,9 @@ struct CardView: View {
         func path(in rect: CGRect) -> Path {
             var path = Path()
             
-            // Code for squiggle is from Joshua Olson
+            // Code for the squiggle is from Joshua Olson
             // https://stackoverflow.com/questions/25387940/how-to-draw-a-perfect-squiggle-in-set-card-game-with-objective-c
+            
             path.move(to: CGPoint(x: 104.0, y: 15.0))
             path.addCurve(to: CGPoint(x: 63.0, y: 54.0),
                           control1: CGPoint(x: 112.4, y: 36.9),
@@ -190,12 +200,12 @@ struct CardView: View {
     }
     
     private struct Constants {
-        static let LineWidth: CGFloat = 3
+        static let LineWidth: CGFloat = 5
         static let stripeNumber: Int = 4
         
         struct Diamond {
-            static let apothemScale: CGFloat = 0.65
-            static let scale: CGFloat = 0.55
+            static let apothemScale: CGFloat = 0.62
+            static let scale: CGFloat = 0.56
         }
         struct Squiggle {
             static let scale:CGFloat = 0.75
@@ -228,23 +238,23 @@ struct CardView: View {
     
     return VStack {
         HStack {
-            CardView(Card(feature1: .option1, feature2: .option1, feature3: .option1, feature4: .option1), isFaceUp: true)
+            CardView(Card(feature1: .option1, feature2: .option1, feature3: .option1, feature4: .option1), isFaceUp: true, game: SetGameViewModel())
                 .aspectRatio(2/3, contentMode: .fit)
-            CardView(Card(feature1: .option2, feature2: .option2, feature3: .option2, feature4: .option3), isFaceUp: true)
+            CardView(Card(feature1: .option2, feature2: .option2, feature3: .option2, feature4: .option3), isFaceUp: true, game: SetGameViewModel())
                 .aspectRatio(2/3, contentMode: .fit)
         }
         HStack {
-            CardView(Card(feature1: .option2, feature2: .option3, feature3: .option3, feature4: .option3), isFaceUp: true)
+            CardView(Card(feature1: .option2, feature2: .option3, feature3: .option3, feature4: .option3), isFaceUp: true, game: SetGameViewModel())
                 .aspectRatio(2/3, contentMode: .fit)
 
-            CardView(Card(feature1: .option1, feature2: .option1, feature3: .option3, feature4: .option2), isFaceUp: true)
+            CardView(Card(feature1: .option1, feature2: .option1, feature3: .option3, feature4: .option2), isFaceUp: true, game: SetGameViewModel())
                 .aspectRatio(2/3, contentMode: .fit)
 
                 }
         HStack {
-            CardView(Card(feature1: .option3, feature2: .option2, feature3: .option2, feature4: .option2), isFaceUp: true)
+            CardView(Card(feature1: .option3, feature2: .option2, feature3: .option2, feature4: .option2), isFaceUp: true, game: SetGameViewModel())
                 .aspectRatio(2/3, contentMode: .fit)
-            CardView(Card(feature1: .option3, feature2: .option1, feature3: .option2, feature4: .option3), isFaceUp: false)
+            CardView(Card(feature1: .option3, feature2: .option1, feature3: .option2, feature4: .option3), isFaceUp: false, game: SetGameViewModel())
                 .aspectRatio(2/3, contentMode: .fit)
         }
     }

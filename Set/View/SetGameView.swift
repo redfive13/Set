@@ -13,30 +13,32 @@ struct SetGameView: View {
     
     @ObservedObject var game: SetGameViewModel
     @Namespace private var dealingNamespace
-    @Namespace private var discardNamespace
-    @Namespace private var shuffleNamespace
     
     var body: some View {
-
-        Text("SwiftUI")
-            .navigationTitle("Welcome")
-            .toolbar {
-                Button("About") {
-                    print("About tapped!")
+        NavigationView {
+            VStack {
+                            Text("Set!")
+                    .font(.title)
+                //                .navigationTitle("Welcome")
+                    .toolbar {
+                        Button("Hint") {
+                            print("About tapped!")
+                        }
+                        
+                        Button("New Game") {
+                            print("Help tapped!")
+                        }
+                    }
+                VStack  {
+                    table
+                    bottomControls
                 }
-
-                Button("Help") {
-                    print("Help tapped!")
-                }
-            }
-            VStack  {
-                table
-                bottomControls
-            }
-            .toolbar {
-                newGame
+//                .toolbar {
+//                    newGame
+//                }
             }
         }
+    }
 
 
     
@@ -66,27 +68,27 @@ struct SetGameView: View {
                 //                .overlay(FlyingNumber(number: scoreChange(causedBy: card)))
                 //                .zIndex(scoreChange(causedBy: card) != 0 ? 100 : 0)
                     .onTapGesture {
+
                         selectCard(card)
                     }
             }
         }
     }
-        // TODO: deals from bottom of the deck
+    
+    // TODO: deals from bottom of the deck
     private var drawPile: some View {
          VStack{
             ZStack {
                 ZStack {
                     ForEach(game.drawPile) { card in
                         view(for: card)
-                            .zIndex(100)
                     }
                 }
                 Text("Draw")
                     .font(.caption2)
                     .rotationEffect(.degrees(45))
-                    .cardify(isFaceUp: true, selectedStatus: .unselected)
+                    .cardify()
                     .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
-                    .zIndex(-100)
                     .opacity(game.drawPile.count > 0 ? 0 : 1)
             }
             .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
@@ -111,7 +113,7 @@ struct SetGameView: View {
                     Text("Discard")
                         .font(.caption2)
                         .rotationEffect(.degrees(45))
-                        .cardify(isFaceUp: true, selectedStatus: .unselected)
+                        .cardify()
                         .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
                 }
                 .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
@@ -140,11 +142,14 @@ struct SetGameView: View {
     }
 
 
-    private func view(for card: Card) -> some View {  // FIXME
-        CardView(card, isFaceUp: isFaceUp(card))
-            .matchedGeometryEffect(id: card.id, in: dealingNamespace)
-            .transition(.asymmetric(insertion: .identity, removal: .identity))
-                 }
+    private func view(for card: Card) -> some View {
+
+        //        let _ = print("view \(card)")
+//        return CardViewxxx(card: card, isFaceUp: isFaceUp(card), game: game)
+        return CardView(card, isFaceUp: isFaceUp(card), game: game)
+                .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+                .transition(.asymmetric(insertion: .identity, removal: .identity))
+    }
 
 //    private func Discardview(for card: Card) -> some View {
 //        CardView(card, isFaceUp: isFaceUp(card))
@@ -155,28 +160,6 @@ struct SetGameView: View {
     
     private func selectCard(_ card: Card) {
         game.SelectCard(card)
-        
-        
-        
-//        moveCardToDiscardPile(card)
-
-//        moveCardsToDiscard(cards: [card])
-        
-//        withAnimation {
-//            if isFaceUp(card) {
-//                faceUp.remove(card.id)
-//            } else {
-//                faceUp.insert(card.id)
-//            }
-//            
-//            
-////            game.flipCardFaceUp(card, faceUp: true)
-//
-//            //                    let scoreBeforeChoosing = viewModel.score
-//            game.SelectCard(card)
-//            //                    let scoreChange = viewModel.score - scoreBeforeChoosing
-//            //                    lastScoreChange = (scoreChange, causedByCardID: card.id)
-//        }
     }
     
 
@@ -306,7 +289,7 @@ struct SetGameView: View {
     }
     
     private var DrawThree: some View {
-        VStack {
+        return VStack {
             Text("Deal")
             Text("3 cards")
         }
@@ -351,6 +334,48 @@ struct SetGameView: View {
         }
         timeDelay = delay
     }
+    
+    
+    
+    
+//    struct CardViewxxx: View {
+//        @State var count = 0
+//        typealias Card = SetGameView.Card
+//
+//        let card: Card
+//        let isFaceUp: Bool
+//        @ObservedObject var game: SetGameViewModel
+//        
+//       // @ObservedObject var game: SetGameViewModel
+//
+//        
+//        var body: some View {
+////            var qaz = game.getStatus(card)
+//            let qaz = card.selectedStatus
+//            let _ = print("qaz = \(qaz.rawValue)")
+//            ZStack {
+//                RoundedRectangle(cornerRadius: 12)
+//                    .foregroundColor(.clear)
+//                VStack {
+//                    Text("\(card.selectedStatus.rawValue)")
+//                    let _ = print("cardview = \(card.selectedStatus)")
+//                    Text("\(card.FA)")
+//                    Text("\(count)")
+//
+//
+//                        .aspectRatio(2/3, contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
+//
+//                }
+//
+//            }
+////            .onTapGesture {
+////                count += 1
+////                let _ = print("xxx tap \(count)")
+////            }
+//        }
+//    }
+//    
+//    
     
     
 
