@@ -39,7 +39,8 @@ struct Cardify: ViewModifier, Animatable {
              .opacity(isFaceUp ? 1 : 0)
             base.fill()
                  .overlay { Image(Constants.Background.imageName).resizable().rotation3DEffect(.degrees(rotation), axis: (x: 0, y: 1, z: 0) ).padding(Constants.Background.imageSpacing) }
-                 .opacity(isFaceUp ? 0 : highlightMode == .unselected ? 1 : 0)  // TODO: clean this up? HACK for animation
+//                 .opacity(isFaceUp ? 0 : highlightMode == .unselected ? 1 : 0)  // TODO: clean this up? HACK for animation
+                 .opacity(isFaceUp ? 0 : 1) 
         }
         .rotation3DEffect(.degrees(rotation), axis: (x: 0, y: 1, z: 0) )
         .foregroundStyle(Constants.Background.color)
@@ -75,7 +76,7 @@ struct Cardify: ViewModifier, Animatable {
                             phase -= Constants.Mismatched.phase
                         }
                     }
-            case .clue:
+            case .hint:
                 base
                     .strokeBorder(lineWidth:  Constants.Unselected.lineWidth * 4)
             }

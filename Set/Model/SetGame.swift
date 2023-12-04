@@ -33,53 +33,50 @@ struct SetGame: Observable {
                 }
             }
         }
-        deck.removeLast(81 - 27)
+        deck.removeLast(81 - 12)
     }
     
     mutating func newGame() {
         print("New Game")
         deck.indices.forEach { index in
             deck[index].location = .drawPile
-            //            deck[index].isFaceUp = false
         }
     }
     
     mutating func selectCard(_ card: Card) {
-        
         if selectedCards.count == 3 {
             if areSelectedCardsASet {
                 selectedCards.forEach{ card in
                     moveCardToDiscardPile(card)
                 }
+                return
             } else {
                 selectedCards.forEach{ card in
-                    if let index = deck.firstIndex(where: { $0.id == card.id }) {
+                    if let index = indexOf(card) {
                         deck[index].selected = false
                     }
                 }
             }
         }
-        
-        
-        
-        if let index = deck.firstIndex(where: { $0.id == card.id }) {
-            if deck[index].selected {
-                deck[index].selected = false
-            } else {
-                deck[index].selected = true
-                
-            }
-            
+        if let index = indexOf(card) {
+            deck[index].selected.toggle()
         }
-        
     }
     
     func isCardSelected(_ card: Card) -> Bool {
-        if let index = deck.firstIndex(where: { $0.id == card.id }) {
+        if let index = indexOf(card) {
             return deck[index].selected
         }
         return false
     }
+    
+    func cardLocation(_ card: Card) -> Location {
+        if let index = indexOf(card) {
+            return deck[index].location
+        }
+        return .drawPile
+    }
+    
     
     
     //        if let index = deck.firstIndex(where: { $0.id == card.id }) {
@@ -115,22 +112,43 @@ struct SetGame: Observable {
     }
     
     mutating func dealCard() -> Card {
-        if let card = drawPile.first {
+        if let card = drawPile.last {
             moveCardToTable(card)
             return card
         }
         fatalError("dealCard: draw pile is empty")
     }
     
-    //    mutating func flipCardFaceUp(_ card: Card, faceUp: Bool) {
-    //        if let index = deck.firstIndex(where: { $0.id == card.id }) {
-    //            print("was \(deck[index])")
-    //            deck[index].isFaceUp = faceUp
-    //            print("is \(deck[index])")
-    //        }
-    //    }
+    func getCardByUUID(_ uuid: UUID) -> Card? {
+        return deck.first(where: { $0.id == uuid })
+    }
+    
+    
+    func getAllMatches() -> [[Card]] {
+        var matchingCards = [[Card]]()
+        let NumberOfCards = table.count
+        if NumberOfCards >= 3 {
+            for card1 in 0..<NumberOfCards - 2 {
+                for card2 in card1 + 1..<NumberOfCards - 1 {
+                    for card3 in card2 + 1..<NumberOfCards {
+                        let cards = [table[card1], table[card2], table[card3]]
+                        if areCardsASet(cards) {
+                            matchingCards.append(cards)
+                        }
+                    }
+                }
+            }
+        }
+        return matchingCards
+    }
+    
+    
     
     // MARK: - Helper function
+    
+    private func indexOf(_ card: Card) -> Int? {
+        return deck.firstIndex(where: { $0.id == card.id })
+    }
     
     private func areCardsASet(_ cards: [Card]) -> Bool {
         if cards.count != 3 { return false }
@@ -138,7 +156,6 @@ struct SetGame: Observable {
         if featureMatch(0) && featureMatch(1) && featureMatch(2) && featureMatch(3) {
             return true
         } else {
-            print("card don't match")
             return false
         }
         
@@ -164,6 +181,13 @@ struct SetGame: Observable {
     private mutating func moveCardTo( _ card: Card, location: Location ) {
         if let index = deck.firstIndex(where: { $0.id == card.id }) {
             deck[index].location = location
+            deck[index].selected = false
         }
+    }
+}
+
+extension Array {
+    var only: Element? {
+         count == 1 ? first : nil
     }
 }

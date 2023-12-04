@@ -14,13 +14,17 @@ extension SetGame {
         let feature: [Option]
         var location = Location.drawPile
         var selected = false
-//        var selectedStatus = SelectedStatus.unselected
         
         let id = UUID()
         
         init(feature1: Option, feature2: Option, feature3: Option, feature4: Option) {
             feature = [feature1, feature2, feature3, feature4]
         }
+
+        init() {
+            feature = []
+        }
+        
         
         static func == (lhs: SetGame.Card, rhs: SetGame.Card) -> Bool {
             return lhs.id == rhs.id

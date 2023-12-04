@@ -82,6 +82,11 @@ enum CardShading {
 
 extension SetGame.Card: CustomDebugStringConvertible {
     var debugDescription: String {
+
+        if feature.isEmpty {
+            return "Place hold"
+        }
+
         var description: String = "\(feature[0].rawValue) "
         
         switch feature[1] {

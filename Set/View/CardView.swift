@@ -31,33 +31,38 @@ struct CardView: View {
     
     private func cardFace(_ card: Card) -> some View {
         GeometryReader { geometry in
-            let feature = CardViewModel()
-            
-            let width = min(geometry.size.height, geometry.size.width)
-            let height = max(geometry.size.height, geometry.size.width)
-            let halfWidth = width / 2
-            
-            let shape = AnyView(getShadedShape(
-                shape: feature.shape(of: card),
-                shading: feature.shading(of: card)
-            ))
-            
-            Group {
-                switch feature.number(on: card) {
-                case 1:
-                    shape.position(x: halfWidth, y: height * Constants.Card.One.first)
-                case 2:
-                    shape.position(x: halfWidth, y: height * Constants.Card.Two.first)
-                    shape.position(x: halfWidth, y: height * Constants.Card.Two.second)
-                case 3:
-                    shape.position(x: halfWidth, y: height * Constants.Card.Three.first)
-                    shape.position(x: halfWidth, y: height * Constants.Card.Three.second)
-                    shape.position(x: halfWidth, y: height * Constants.Card.Three.third)
-                default:
-                    Text("🚫").font(.largeTitle)
+            if card.feature.isEmpty {
+                EmptyView()
+            } else {
+                
+                let feature = CardViewModel()
+                
+                let width = min(geometry.size.height, geometry.size.width)
+                let height = max(geometry.size.height, geometry.size.width)
+                let halfWidth = width / 2
+                
+                let shape = AnyView(getShadedShape(
+                    shape: feature.shape(of: card),
+                    shading: feature.shading(of: card)
+                ))
+                
+                Group {
+                    switch feature.number(on: card) {
+                    case 1:
+                        shape.position(x: halfWidth, y: height * Constants.Card.One.first)
+                    case 2:
+                        shape.position(x: halfWidth, y: height * Constants.Card.Two.first)
+                        shape.position(x: halfWidth, y: height * Constants.Card.Two.second)
+                    case 3:
+                        shape.position(x: halfWidth, y: height * Constants.Card.Three.first)
+                        shape.position(x: halfWidth, y: height * Constants.Card.Three.second)
+                        shape.position(x: halfWidth, y: height * Constants.Card.Three.third)
+                    default:
+                        Text("🚫").font(.largeTitle)
+                    }
                 }
+                .foregroundStyle(feature.color(of: card))
             }
-            .foregroundStyle(feature.color(of: card))
         }
     }
     
@@ -200,7 +205,7 @@ struct CardView: View {
     }
     
     private struct Constants {
-        static let LineWidth: CGFloat = 5
+        static let LineWidth: CGFloat = 4
         static let stripeNumber: Int = 4
         
         struct Diamond {

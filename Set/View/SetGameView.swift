@@ -14,6 +14,8 @@ struct SetGameView: View {
     @ObservedObject var game: SetGameViewModel
     @Namespace private var dealingNamespace
     
+    @State var debug:Bool = true
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -27,15 +29,13 @@ struct SetGameView: View {
                         
                         Button("New Game") {
                             print("Help tapped!")
+                            newGame()
                         }
                     }
                 VStack  {
                     table
                     bottomControls
                 }
-//                .toolbar {
-//                    newGame
-//                }
             }
         }
     }
@@ -58,10 +58,43 @@ struct SetGameView: View {
         }
     }
     
+    // MARK: - Piles
+    
+    
+    
+    private func allCardsLocated(on location: SetGame.Location) -> [Card] {
+        return game.deck.filter({
+            if let cardLocation = cardAnimationLocation[$0.id] {
+                return cardLocation == location ? true : false
+            } else {
+                // if card not in cardAnimationLocation, it is on the drawpile
+                return location == .drawPile ? true : false
+            }
+        })
+    }
+    
+    private func isCard(_ card: Card, on wantedLocation: SetGame.Location) -> Bool{
+        var animationLocation: SetGame.Location = .drawPile
+        if card.feature.isEmpty {
+            return true
+        }
+        if let location = cardAnimationLocation[card.id] {
+            animationLocation = location
+        }
+//        var cardLocation = card.location
+        
+        
+        if animationLocation == wantedLocation {
+            return true
+        }
+        return false
+    }
+    
+    
     
     private var table: some View {
-        AspectVGrid(game.tablePile, aspectRatio: Constants.aspectRatio) { card in
-            if isDealt(card) {
+        return AspectVGrid(game.tableLayout, aspectRatio: Constants.aspectRatio) { card in
+            if isCard(card, on: .table) {
                 view(for: card)
                     .foregroundStyle(game.cardColor)
                     .padding(Constants.spacing)
@@ -71,6 +104,9 @@ struct SetGameView: View {
 
                         selectCard(card)
                     }
+            } else {
+                    RoundedRectangle(cornerRadius: 0)
+                .opacity(0)
             }
         }
     }
@@ -84,52 +120,59 @@ struct SetGameView: View {
                         view(for: card)
                     }
                 }
+                .zIndex(10)
                 Text("Draw")
                     .font(.caption2)
                     .rotationEffect(.degrees(45))
                     .cardify()
                     .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
-                    .opacity(game.drawPile.count > 0 ? 0 : 1)
+                    .zIndex(-100)
+//                    .opacity(game.drawPile.count > 0 ? 0 : 1)
             }
             .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
-            .onAppear() {
-                dealCards(Constants.StartingCards)
-            }
-            .onTapGesture {
-                dealCards(Constants.DrawMoreCards)
-            }
-             Text("\(game.drawPile.count)")
-            
+            .onAppear() { dealCards(Constants.startingCards) }
+            .onTapGesture {  dealCards(Constants.drawMoreCards) }
+             if debug {
+                 Text("\(game.drawPile.count)")
+             }
         }
     }
     
     private var discard: some View {
-            VStack {
-                ZStack {
-                    ForEach(unDiscadedCards) { card in
+        VStack {
+            ZStack {
+                //cardAnimationLocation
+                ForEach(game.discardPile) { card in
+                    if isDiscarded(card) {
                         view(for: card)
                     }
-                    
-                    Text("Discard")
-                        .font(.caption2)
-                        .rotationEffect(.degrees(45))
-                        .cardify()
-                        .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
                 }
-                .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
-                Text("\(unDiscadedCards.count)")
+                
+                Text("Discard")
+                    .font(.caption2)
+                    .rotationEffect(.degrees(45))
+                    .cardify()
+                    .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
+                    .zIndex(-100)
+//                    .opacity(game.discardPile.count > 0 ? 0 : 1)
+
             }
+            .frame(width: Constants.deckWidth, height: Constants.deckWidth / Constants.aspectRatio)
+            if debug {
+                Text("\(game.discardPile.count)")
+            }
+        }
 // TODO: factor out frame
     }
+    
+    
+    
+    // MARK: - screen views
         
     private var title: some View {
         Text("Set!").font(.largeTitle)
     }
-
-
-    
-    
-    
+        
     private var bottomControls: some View {
         HStack {
             drawPile
@@ -157,9 +200,13 @@ struct SetGameView: View {
 //            .transition(.asymmetric(insertion: .identity, removal: .identity))
 //    }
     
+    // MARK: - Actions
+
     
     private func selectCard(_ card: Card) {
         game.SelectCard(card)
+        discardCards()
+
     }
     
 
@@ -176,20 +223,22 @@ struct SetGameView: View {
 
 
     
+    // MARK: - Card location function
+
     
-    
-    @State private var status = [Card.ID: SetGame.Location]()
+    @State private var cardAnimationLocation = [Card.ID: SetGame.Location]()
     
 //    @State private var dealt = Set<Card.ID>()
     @State private var discarded = Set<Card.ID>()
     @State private var draw = Set<Card.ID>()
 
-    @State private var timeDelay: TimeInterval = 0
+    //@State private var timeDelay: TimeInterval = 0
     
     
     private func cardNeedsToMove(_ card: Card, location wantedLocation: SetGame.Location) -> Bool {
-        if let location = status[card.id] {
-            if card.location == wantedLocation && location !=  wantedLocation {
+        if let cardAnimationLocation = cardAnimationLocation[card.id] {
+            if game.cardLocation(card) == wantedLocation && cardAnimationLocation != wantedLocation {
+                // maybe only need card.location
                 return true
             }
         }
@@ -197,20 +246,28 @@ struct SetGameView: View {
     }
 
     private func isDealt(_ card: Card) -> Bool {
-        if let location = status[card.id] {
+        if let location = cardAnimationLocation[card.id] {
             if location == .table {
                 return true
             }
         }
         return false
     }
-    private var undealtCards: [Card] {
-        return game.drawPile.filter { cardNeedsToMove($0, location: .table) }
-    }
+
+
+    
+    
+    
+    
+    
+    
+//    private var undealtCards: [Card] {
+//        return game.drawPile.filter { cardNeedsToMove($0, location: .table) }
+//    }
     
     private func isDiscarded(_ card: Card) -> Bool {
-        if let location = status[card.id] {
-            if location == .table {
+        if let location = cardAnimationLocation[card.id] {
+            if location == .discardPile {
                 return true
             }
         }
@@ -218,9 +275,7 @@ struct SetGameView: View {
 
     }
     private var unDiscadedCards: [Card] {
-        let foo = game.tablePile.filter { cardNeedsToMove($0, location: .discardPile) }
-//        let _ = print("unDiscadedCards = \(foo.count)")
-            return foo
+        return game.discardPile.filter { cardNeedsToMove($0, location: .discardPile) }
     }
     
     private func isDrawn(_ card: Card) -> Bool {
@@ -230,42 +285,123 @@ struct SetGameView: View {
         game.discardPile.filter { !isDiscarded($0) }
     }
     
-    
+//    private func addCardToTable(_ card: Card) {
+//        if let openSlot = tableArrangement.firstIndex( where: { $0 == nil } ){
+//            tableArrangement[openSlot] = card.id
+//        } else {
+//            tableArrangement.append(card.id)
+//        }
+//    }
+//    
+//    private func removeCardFromTable(_ card: Card) {
+//        if let openSlot = tableArrangement.firstIndex( where: { $0 == nil } ){
+//            tableArrangement[openSlot] = nil
+//        }
+//        if game.drawPile.count == 0 {
+//            tableArrangement = tableArrangement.filter { $0 != nil }
+//        }
+//    }
 
+    //MARK: Move Cards
     
-    private func dealCards(_ numberOfCards: Int) {
-        var delay: TimeInterval = timeDelay
+    private func dealCards(_ numberOfCards: Int, initialDelay: TimeInterval = 0) {
+        var delay = initialDelay
         var cards = [Card]()
 
+        if game.drawPile.isEmpty {
+            return
+        }
         for _ in 0..<numberOfCards {
             let card = game.dealCard()
+            game.addCardToTable(card)
             cards.append(card)
-            
         }
         cards.forEach{ card in
-            withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
-                status[card.id] = .table
+            withAnimation(Constants.Deal.animation.delay(delay)) {
+                cardAnimationLocation[card.id] = .table
             }
-            withAnimation(Constants.Deal.dealAnimation.delay(delay + 0.5)) {
+            withAnimation(Constants.Deal.animation.delay(delay + Constants.Deal.faceUpDelay)) {
                 _ = faceUp.insert(card.id)
 
             }
-            delay += Constants.Deal.dealInterval
+            delay += Constants.Deal.interval
         }
     }
+//========================================================================
+    // MARK: DISCARD!!!!
     
-    private func moveCardsToDiscard(cards: [Card]) {
-        var delay: TimeInterval = timeDelay
-        //var cards = [Card]()
+    private func discardCards() {
+        var delay: TimeInterval = 0
+        let cards = unDrawCards.reversed()
+        
+        if cards.isEmpty {
+            return
+        }
+        
+        cards.forEach { card in
+            withAnimation(Constants.Discard.animation.delay(delay)) {
+                _ = faceUp.remove(card.id)
+            } completion: { moveCardToDiscardPile(card) }
+            delay += Constants.Deal.interval
+        }
+        
+        func moveCardToDiscardPile(_ card: Card) {
+            withAnimation(Constants.Discard.animation.delay(Constants.Discard.faceDownDelay)) {
+                cardAnimationLocation[card.id] = .discardPile
+                game.removeCardFromTable(card)
+            } completion: { dealCards(1, initialDelay: delay)}
+        }
+    }
+
+    private func newGameResetCards(cards: [Card]) {
+        var delay: TimeInterval = 0
+
+        game.drawPile.forEach{ card in
+            withAnimation(Constants.NewGame.animation.delay(delay)) {
+                moveCardToDiscardPile(card)
+            }
+            delay += Constants.NewGame.interval
+        }
+        
+        game.tablePile.forEach { card in
+            withAnimation(Constants.Discard.animation.delay(delay)) {
+                _ = faceUp.remove(card.id)
+            } completion: { moveCardToDiscardPile(card) }
+            delay += Constants.Deal.interval
+        }
+        
+        func moveCardToDiscardPile(_ card: Card) {
+            withAnimation(Constants.Discard.animation.delay(Constants.Discard.faceDownDelay)) {
+                cardAnimationLocation[card.id] = .discardPile
+                game.MoveCardToDiscardPile(card)
+                game.removeCardFromTable(card)
+            } completion: { moveCardsToDrawPile() }
+        }
+
+        func moveCardsToDrawPile() {
+            game.discardPile.forEach{ card in
+                withAnimation(Constants.Discard.animation.delay(Constants.Discard.faceDownDelay + 4)) {
+                    game.moveCardToDrawPile(card)
+                    
+                }
+            }
+        }
+        
+    }
+    
+    func junk() {
+        var cards: [Card] = []
+        var delay:TimeInterval = 0
+
         cards.forEach { card in
             game.MoveCardToDiscardPile(card)
         }
         cards.forEach{ card in
-            withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
+            withAnimation(Constants.Discard.animation.delay(delay)) {
 //                _ = dealt.remove(card.id)
 //                _ = discarded.insert(card.id)
             }
-            delay += Constants.Deal.dealInterval
+            delay += Constants.Discard.interval
 
         }
 
@@ -274,42 +410,67 @@ struct SetGameView: View {
     
     
     
-    private var newGame: some View {
-            Text("New game")
-
-            .onTapGesture {
-                print("try try again")
-                moveCardsToDiscard(cards: game.tablePile)
-                
-                
-//                withAnimation {
-//                    startNewGame()
-//                }
-            }
+    func newGame()  {
+        newGameResetCards(cards: game.tablePile)
     }
     
+    @State var hintMode = false
+
     private var DrawThree: some View {
-        return VStack {
-            Text("Deal")
-            Text("3 cards")
-        }
+        VStack {
+            VStack {
+//                Text("Deal")
+                Text("Deal 3 cards")
+            }
             .font(.title2)
             .onTapGesture {
-                dealCards(Constants.DrawMoreCards)
+                dealCards(Constants.drawMoreCards)
             }
+            .padding()
+            Group {
+                if hintMode {
+                    HStack {
+                        Image(systemName: "arrow.backward.square")
+                            .onTapGesture {
+                                game.nextHint()
+                            }
+                        Text(" \(game.currentHint + 1) of \(game.availableMatches()) matches ")
+                            .onTapGesture {
+                                hintMode = false
+                                game.setMode(mode: true)
+                            }
+                        Image(systemName: "arrow.right.square")
+                            .onTapGesture {
+                                game.nextHint(forward: false)
+                            }
+                    }
+                } else {
+                    Text("Hints")
+                        .onTapGesture {
+                            hintMode = true
+                            game.setMode(mode: true)
+                        }
+                    
+                    
+                }
+                
+            }
+//TODO: add animation to tex change
+            
+        }
+
     }
     
     private func startNewGame() {
         moveCardsToDiscardPile()
-        status.removeAll()
+        cardAnimationLocation.removeAll()
         faceUp = []
 //        game.NewGame()
-        dealCards(Constants.StartingCards)
-        timeDelay = 0
+        dealCards(Constants.startingCards)
     }
     
     private func moveCardToDiscardPile(_ card: Card, delay: TimeInterval = 0) {
-        withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
+        withAnimation(Constants.Deal.animation.delay(delay)) {
 //            _ = dealt.remove(card.id)
 //                _ = faceUp.remove(card.id)
             _ = discarded.insert(card.id)
@@ -320,76 +481,50 @@ struct SetGameView: View {
     private func moveCardsToDiscardPile() {
         var delay: TimeInterval = 0
         game.tablePile.forEach{ card in
-            withAnimation(Constants.Deal.dealAnimation.delay(delay)) {
+            withAnimation(Constants.Deal.animation.delay(delay)) {
 
 
             }
             
-            withAnimation(Constants.Deal.dealAnimation.delay(delay + 0.5 )) {
+            withAnimation(Constants.Deal.animation.delay(delay + 0.5 )) {
 //                _ = dealt.remove(card.id)
 
             }
 
-            delay += Constants.Deal.dealInterval
+            delay += Constants.Deal.interval
         }
-        timeDelay = delay
     }
     
     
     
     
-//    struct CardViewxxx: View {
-//        @State var count = 0
-//        typealias Card = SetGameView.Card
-//
-//        let card: Card
-//        let isFaceUp: Bool
-//        @ObservedObject var game: SetGameViewModel
-//        
-//       // @ObservedObject var game: SetGameViewModel
-//
-//        
-//        var body: some View {
-////            var qaz = game.getStatus(card)
-//            let qaz = card.selectedStatus
-//            let _ = print("qaz = \(qaz.rawValue)")
-//            ZStack {
-//                RoundedRectangle(cornerRadius: 12)
-//                    .foregroundColor(.clear)
-//                VStack {
-//                    Text("\(card.selectedStatus.rawValue)")
-//                    let _ = print("cardview = \(card.selectedStatus)")
-//                    Text("\(card.FA)")
-//                    Text("\(count)")
-//
-//
-//                        .aspectRatio(2/3, contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
-//
-//                }
-//
-//            }
-////            .onTapGesture {
-////                count += 1
-////                let _ = print("xxx tap \(count)")
-////            }
-//        }
-//    }
-//    
-//    
-    
-    
+
 
 
     private struct Constants {
-//        static let StartingCards: Int = 12
-        static let StartingCards: Int = 6
-        static let DrawMoreCards: Int = 3
+//        static let startingCards: Int = 12
+        static let startingCards: Int = 6
+        static let drawMoreCards: Int = 3
         static let aspectRatio: CGFloat = 2/3
         static let spacing: CGFloat = 4
         struct Deal {
-            static let dealAnimation: Animation = .easeInOut(duration: 1)
-            static let dealInterval: TimeInterval = 0.15
+            private static let debug = false
+            static let animation: Animation = .easeInOut(duration: debug ? 0 : 1)
+            static let interval: TimeInterval = 0.15 * 0.01
+            static let faceUpDelay: TimeInterval = 0.5 * 0.01
         }
+        struct Discard {
+            static let animation: Animation = .bouncy(duration: 1)
+            static let interval: TimeInterval = 0.15
+            static let faceDownDelay: TimeInterval = 0.25
+        }
+        struct NewGame {
+            static let animation: Animation = .spring(duration: 1, bounce: 0.9)
+            static let interval: TimeInterval = 0.5
+            static let faceUpDelay: TimeInterval = 0.25
+        }
+        
+        
         static let deckWidth: CGFloat = 50
     }
 }
